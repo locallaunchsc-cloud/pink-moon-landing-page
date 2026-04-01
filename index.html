@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINK MOON · April 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&display=swap" rel="stylesheet" crossorigin>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;color:#fff}
+  #c{position:fixed;inset:0;width:100%;height:100%}
+
+  /* ── Loader ── */
+  #loader{
+    position:fixed;inset:0;background:#000;z-index:200;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:opacity .9s ease;font-family:'Space Grotesk',sans-serif;
+  }
+  .lmoon{
+    width:56px;height:56px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#ffcce8,#ff69b4,#c2185b);
+    box-shadow:0 0 40px rgba(255,105,180,.9),0 0 80px rgba(255,20,147,.4);
+    animation:lp 1.4s ease-in-out infinite;margin-bottom:18px;
+  }
+  @keyframes lp{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  .ltxt{font-size:10px;letter-spacing:.45em;color:rgba(255,182,193,.6);text-transform:uppercase}
+
+  /* ── No-WebGL ── */
+  #nowgl{
+    display:none;position:fixed;inset:0;background:#000;
+    align-items:center;justify-content:center;flex-direction:column;
+    text-align:center;padding:40px;font-family:'Space Grotesk',sans-serif;
+  }
+
+  /* ── UI layer ── */
+  #ui{position:fixed;inset:0;pointer-events:none;font-family:'Space Grotesk',sans-serif}
+
+  /* Title */
+  .tb{position:absolute;top:30px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .ttl{
+    font-size:clamp(46px,9vw,100px);font-weight:900;letter-spacing:.09em;line-height:1;
+    background:linear-gradient(135deg,#ffcce8 0%,#ff1a8c 35%,#ff69b4 65%,#ffb6e0 100%);
+    background-size:300% 300%;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    animation:sh 5s ease-in-out infinite;
+    filter:drop-shadow(0 0 28px rgba(255,20,147,.9)) drop-shadow(0 0 56px rgba(255,105,180,.45));
+  }
+  @keyframes sh{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .tsub{font-size:10px;letter-spacing:.48em;color:rgba(255,182,193,.5);margin-top:8px;text-transform:uppercase;font-weight:300}
+  .tpill{
+    display:inline-block;margin-top:10px;padding:4px 16px;
+    border:1px solid rgba(255,105,180,.3);border-radius:20px;
+    font-size:9px;letter-spacing:.22em;color:rgba(255,200,220,.75);
+    background:rgba(255,20,147,.06);text-transform:uppercase;
+  }
+
+  /* Stats — right */
+  #stats{position:absolute;top:50%;right:38px;transform:translateY(-50%)}
+  .st{margin-bottom:20px}
+  .sl{font-size:8px;letter-spacing:.3em;color:rgba(255,182,193,.4);text-transform:uppercase}
+  .sv{font-size:15px;font-weight:700;color:rgba(255,255,255,.9);margin-top:2px}
+
+  /* Diagram — bottom right */
+  #dw{position:absolute;bottom:40px;right:38px;text-align:center}
+  #dg{display:block;border:1px solid rgba(255,105,180,.2);border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+  .dl{font-size:8px;letter-spacing:.3em;color:rgba(255,182,193,.35);margin-top:6px;text-transform:uppercase}
+
+  /* City search — bottom center */
+  #cb{
+    position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+    pointer-events:all;width:min(360px,88vw);text-align:center;
+  }
+  .clbl{font-size:9px;letter-spacing:.32em;color:rgba(255,182,193,.42);text-transform:uppercase;margin-bottom:7px}
+  .ciw{position:relative}
+  #ci{
+    width:100%;padding:10px 20px;font-size:13px;font-weight:500;
+    font-family:'Space Grotesk',sans-serif;
+    background:rgba(8,3,18,.78);border:1px solid rgba(255,105,180,.28);
+    border-radius:30px;color:#fff;outline:none;text-align:center;
+    transition:border-color .2s,box-shadow .2s;backdrop-filter:blur(12px);
+  }
+  #ci::placeholder{color:rgba(255,182,193,.32)}
+  #ci:focus{border-color:rgba(255,105,180,.7);box-shadow:0 0 22px rgba(255,20,147,.22)}
+  #cr{
+    position:absolute;bottom:calc(100% + 8px);left:0;right:0;
+    background:rgba(6,2,14,.93);border:1px solid rgba(255,105,180,.18);
+    border-radius:12px;overflow:hidden;backdrop-filter:blur(14px);display:none;
+  }
+  .cri{
+    padding:10px 18px;font-size:12px;cursor:pointer;
+    color:rgba(255,220,235,.82);text-align:left;
+    border-bottom:1px solid rgba(255,105,180,.07);transition:background .13s;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .cri:last-child{border-bottom:none}
+  .cri:hover{background:rgba(255,20,147,.13);color:#fff}
+  #cs{font-size:10px;letter-spacing:.2em;color:rgba(255,182,193,.58);margin-top:7px;text-transform:uppercase;display:none}
+
+  /* Overlay effects */
+  #vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.65) 100%)}
+  #scn{position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.018) 3px,rgba(0,0,0,.018) 4px)}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="lmoon"></div><div class="ltxt">Rendering Pink Moon…</div></div>
+<div id="nowgl">
+  <div style="font-size:44px;margin-bottom:14px">🌕</div>
+  <div style="font-size:17px;font-weight:700;margin-bottom:8px">WebGL not available</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.45)">Open in Chrome, Firefox, or Edge to view the 3D scene.</div>
+</div>
+
+<canvas id="c"></canvas>
+<div id="scn"></div>
+<div id="vig"></div>
+
+<div id="ui">
+  <div class="tb">
+    <div class="ttl">PINK MOON</div>
+    <div class="tsub">Full Moon &bull; April 2026</div>
+    <div class="tpill" id="dpill">April 1, 2026 &bull; Full Illumination</div>
+  </div>
+
+  <div id="stats">
+    <div class="st"><div class="sl">Illumination</div><div class="sv">99.8%</div></div>
+    <div class="st"><div class="sl">Distance</div><div class="sv">384,400 km</div></div>
+    <div class="st"><div class="sl">Phase</div><div class="sv">Full Moon</div></div>
+    <div class="st"><div class="sl">Named After</div><div class="sv">Pink Phlox</div></div>
+  </div>
+
+  <div id="dw">
+    <canvas id="dg" width="155" height="155"></canvas>
+    <div class="dl">Earth · Moon · Sun</div>
+  </div>
+
+  <div id="cb">
+    <div class="clbl">📍 Where are you viewing from?</div>
+    <div class="ciw">
+      <input id="ci" type="text" placeholder="Type your city…" autocomplete="off" spellcheck="false">
+      <div id="cr"></div>
+    </div>
+    <div id="cs"></div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── WebGL check ───────────────────────────────────────────────
+(function(){
+  try{
+    const t=document.createElement('canvas');
+    if(!(window.WebGLRenderingContext&&(t.getContext('webgl')||t.getContext('experimental-webgl')))){throw 0;}
+  }catch(e){
+    document.getElementById('loader').style.display='none';
+    document.getElementById('nowgl').style.display='flex';
+    document.getElementById('ui').style.display='none';
+    document.getElementById('c').style.display='none';
+    return;
+  }
+})();
+
+// ── Scene ─────────────────────────────────────────────────────
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);
+camera.position.set(.3,.6,3.8);
+
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=.04;
+controls.minDistance=1.6;controls.maxDistance=10;
+controls.autoRotate=true;controls.autoRotateSpeed=.22;
+
+// ── Stars ─────────────────────────────────────────────────────
+let starMat;
+(function(){
+  const N=7000,geo=new THREE.BufferGeometry();
+  const p=new Float32Array(N*3),c=new Float32Array(N*3),s=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=300+Math.random()*200;
+    p[i*3]=r*Math.sin(ph)*Math.cos(th);p[i*3+1]=r*Math.sin(ph)*Math.sin(th);p[i*3+2]=r*Math.cos(ph);
+    const w=Math.random();
+    c[i*3]=.85+w*.15;c[i*3+1]=.85+(1-w)*.1;c[i*3+2]=.9+(1-w)*.1;
+    s[i]=Math.random()<.04?2.6:Math.random()<.15?1.5:.7;
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(p,3));
+  geo.setAttribute('aColor',new THREE.BufferAttribute(c,3));
+  geo.setAttribute('aSize',new THREE.BufferAttribute(s,1));
+  starMat=new THREE.ShaderMaterial({
+    vertexShader:`attribute float aSize;attribute vec3 aColor;varying vec3 vC;uniform float t;
+      void main(){vC=aColor;float tw=1.+.25*sin(t*1.8+position.x*.08+position.z*.05);
+      gl_PointSize=aSize*tw;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec3 vC;void main(){vec2 c=gl_PointCoord-.5;float a=1.-smoothstep(.25,.5,length(c));gl_FragColor=vec4(vC,a*.95);}`,
+    uniforms:{t:{value:0}},transparent:true,depthWrite:false,
+    blending:THREE.AdditiveBlending,
+  });
+  scene.add(new THREE.Points(geo,starMat));
+})();
+
+// ── Earth ─────────────────────────────────────────────────────
+const earthMat=new THREE.ShaderMaterial({
+  uniforms:{t:{value:0},mDir:{value:new THREE.Vector3(1,.3,.5).normalize()},camPos:{value:new THREE.Vector3()}},
+  vertexShader:`varying vec3 vN,vWP;varying vec2 vU;
+    void main(){vN=normalize(normalMatrix*normal);vU=uv;vWP=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`
+    varying vec3 vN,vWP;varying vec2 vU;
+    uniform float t;uniform vec3 mDir,camPos;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<6;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
+    void main(){
+      float land=smoothstep(.43,.53,fbm(vU*3.5));
+      float lat=(vU.y-.5)*3.14159;
+      float snow=smoothstep(1.15,1.45,abs(lat));
+      float dz=smoothstep(0.,.4,abs(lat))*(1.-smoothstep(.4,.7,abs(lat)))*smoothstep(.52,.62,fbm(vU*7.+vec2(3.2,1.7)))*land*(1.-snow);
+      vec3 oc=mix(vec3(.04,.10,.32),vec3(.06,.18,.42),fbm(vU*7.+vec2(3.,2.)));
+      vec3 lc=mix(vec3(.12,.30,.10),vec3(.20,.22,.15),fbm(vU*14.+vec2(1.3,5.2)));
+      lc=mix(lc,vec3(.52,.42,.22),dz);lc=mix(lc,vec3(.92,.93,1.),snow);
+      vec3 base=mix(oc,lc,land);
+      float diff=max(dot(vN,mDir),0.);
+      vec3 lit=base*(vec3(.04,.04,.10)+vec3(1.,.58,.80)*diff*.9);
+      float dark=1.-smoothstep(0.,.25,diff);
+      lit+=vec3(1.,.88,.55)*smoothstep(.68,.72,fbm(vU*18.+vec2(7.,2.)))*land*dark*.7;
+      vec3 vd=normalize(camPos-vWP);
+      lit+=vec3(1.,.75,.90)*pow(max(dot(vN,normalize(mDir+vd)),0.),80.)*(1.-land)*.6;
+      gl_FragColor=vec4(lit,1.);
+    }`,
+});
+const earth=new THREE.Mesh(new THREE.SphereGeometry(1,72,72),earthMat);
+scene.add(earth);
+
+// Atmosphere inner
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.025,64,64),new THREE.ShaderMaterial({
+  uniforms:{mDir:{value:new THREE.Vector3(1,.3,.5).normalize()}},
+  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec3 vN;uniform vec3 mDir;void main(){float rim=pow(1.-abs(dot(vN,vec3(0,0,1))),2.8);float d=max(dot(vN,mDir),0.);vec3 c=mix(vec3(.05,.05,.2),mix(vec3(.2,.5,1.),vec3(.5,.8,1.),d),smoothstep(0.,.4,d));gl_FragColor=vec4(c,rim*.55);}`,
+  side:THREE.FrontSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,
+})));
+// Atmosphere outer halo
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.08,64,64),new THREE.ShaderMaterial({
+  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec3 vN;void main(){float rim=pow(1.-abs(dot(vN,vec3(0,0,1))),4.);gl_FragColor=vec4(.15,.4,.9,rim*.28);}`,
+  side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,
+})));
+
+// ── Moon ─────────────────────────────────────────────────────
+const moonGroup=new THREE.Group();
+scene.add(moonGroup);
+
+const moonMat=new THREE.ShaderMaterial({
+  uniforms:{t:{value:0}},
+  vertexShader:`varying vec3 vN;varying vec2 vU;void main(){vN=normalize(normalMatrix*normal);vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`
+    varying vec3 vN;varying vec2 vU;uniform float t;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
+    float cr(vec2 uv,vec2 c,float r){float d=length(uv-c);return smoothstep(r,r*.5,d)*smoothstep(r*1.2,r,d);}
+    void main(){
+      float s=fbm(vU*6.)*.55+fbm(vU*14.+vec2(2.,3.))*.3+fbm(vU*30.+vec2(5.,1.))*.15;
+      float c=cr(vU,vec2(.3,.6),.06)+cr(vU,vec2(.65,.35),.04)+cr(vU,vec2(.5,.7),.025)+cr(vU,vec2(.2,.45),.035);
+      vec3 col=mix(vec3(.85,.38,.62),vec3(1.,.72,.87),s-c*.3);
+      col=mix(col,vec3(1.,.9,.96),fbm(vU*30.+vec2(5.,1.))*.4);
+      col=mix(col,vec3(.55,.18,.38),c*.6);
+      col*=.48+.56*dot(vN,vec3(0,0,1));
+      col*=1.45;
+      gl_FragColor=vec4(col,1.);
+    }`,
+});
+moonGroup.add(new THREE.Mesh(new THREE.SphereGeometry(.30,72,72),moonMat));
+
+// Glow halos
+[{s:.34,o:.24},{s:.41,o:.14},{s:.55,o:.07},{s:.78,o:.04},{s:1.15,o:.02}].forEach(({s,o})=>{
+  moonGroup.add(new THREE.Mesh(new THREE.SphereGeometry(s,32,32),new THREE.ShaderMaterial({
+    uniforms:{op:{value:o}},
+    vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec3 vN;uniform float op;void main(){float f=pow(1.-abs(dot(vN,vec3(0,0,1))),1.7);gl_FragColor=vec4(1.,.35,.70,f*op);}`,
+    side:THREE.FrontSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,
+  })));
+});
+// Back-side corona
+moonGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32),new THREE.ShaderMaterial({
+  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec3 vN;void main(){float f=pow(1.-abs(dot(vN,vec3(0,0,1))),3.5);gl_FragColor=vec4(1.,.2,.6,f*.022);}`,
+  side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,
+})));
+
+moonGroup.position.set(2.6,.6,-1.);
+const moonLight=new THREE.PointLight(0xff55aa,3.2,30);
+moonLight.position.copy(moonGroup.position);
+scene.add(moonLight);
+scene.add(new THREE.AmbientLight(0x0a0820,1.5));
+
+// ── Location marker ───────────────────────────────────────────
+let marker=null,userLat=0,userLon=0,hasLoc=false;
+
+function ll3(lat,lon,r){
+  const phi=(90-lat)*Math.PI/180,th=(lon+180)*Math.PI/180;
+  return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(th),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(th));
+}
+
+function placeMarker(lat,lon){
+  if(marker)marker.all.forEach(m=>scene.remove(m));
+  userLat=lat;userLon=lon;hasLoc=true;
+  const p=ll3(lat,lon,1.03);
+  const dot=new THREE.Mesh(new THREE.SphereGeometry(.013,16,16),new THREE.MeshBasicMaterial({color:0xff1493}));
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.019,.028,32),new THREE.MeshBasicMaterial({color:0xff69b4,side:THREE.DoubleSide,transparent:true,opacity:.9}));
+  const halo=new THREE.Mesh(new THREE.SphereGeometry(.052,16,16),new THREE.MeshBasicMaterial({color:0xff69b4,transparent:true,opacity:.25}));
+  [dot,ring,halo].forEach(m=>{m.position.copy(p);scene.add(m);});
+  ring.lookAt(p.clone().multiplyScalar(3));
+  marker={dot,ring,halo,all:[dot,ring,halo]};
+}
+
+function tickMarker(){
+  if(!marker||!hasLoc)return;
+  const phi=(90-userLat)*Math.PI/180;
+  const th=(userLon+180)*Math.PI/180+earth.rotation.y;
+  const r=1.03,p=new THREE.Vector3(-r*Math.sin(phi)*Math.cos(th),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(th));
+  marker.all.forEach(m=>m.position.copy(p));
+  marker.ring.lookAt(p.clone().multiplyScalar(3));
+}
+
+// ── City search ───────────────────────────────────────────────
+const ci=document.getElementById('ci');
+const cr=document.getElementById('cr');
+const cs=document.getElementById('cs');
+let stimer;
+
+ci.addEventListener('input',()=>{
+  clearTimeout(stimer);
+  const q=ci.value.trim();
+  if(q.length<2){cr.style.display='none';return;}
+  stimer=setTimeout(()=>doSearch(q),380);
+});
+ci.addEventListener('keydown',e=>{if(e.key==='Escape'){cr.style.display='none';ci.blur();}});
+document.addEventListener('click',e=>{if(!e.target.closest('#cb'))cr.style.display='none';});
+
+async function doSearch(q){
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&addressdetails=1`);
+    const data=await res.json();
+    if(!data.length){cr.style.display='none';return;}
+    cr.innerHTML=data.map((d,i)=>{
+      const label=d.display_name.split(',').slice(0,3).join(', ');
+      return `<div class="cri" data-lat="${d.lat}" data-lon="${d.lon}" data-name="${label}">${label}</div>`;
+    }).join('');
+    cr.style.display='block';
+    cr.querySelectorAll('.cri').forEach(el=>el.addEventListener('click',()=>{
+      placeMarker(parseFloat(el.dataset.lat),parseFloat(el.dataset.lon));
+      ci.value='';cr.style.display='none';
+      cs.textContent='📍 '+el.dataset.name;cs.style.display='block';
+    }));
+  }catch(e){cr.style.display='none';}
+}
+
+// ── 2D Diagram ────────────────────────────────────────────────
+const dc=document.getElementById('dg'),dctx=dc.getContext('2d');
+const DW=dc.width,DH=dc.height,DCX=DW/2,DCY=DH/2;
+// pre-generate stable star positions
+const dstars=Array.from({length:55},(_,i)=>({x:(Math.sin(i*137.508)*.5+.5)*DW,y:(Math.cos(i*137.508)*.5+.5)*DH,r:i%9===0?.9:.4}));
+
+function drawDiag(t){
+  dctx.clearRect(0,0,DW,DH);
+  dctx.fillStyle='rgba(3,2,12,.9)';
+  dctx.beginPath();dctx.arc(DCX,DCY,DCX,0,Math.PI*2);dctx.fill();
+
+  // stars
+  dstars.forEach(({x,y,r})=>{dctx.beginPath();dctx.arc(x,y,r,0,Math.PI*2);dctx.fillStyle='rgba(255,255,255,.48)';dctx.fill();});
+
+  const moonA=t*.075+Math.PI,sunA=moonA+Math.PI;
+  const OR=64;
+
+  // Sun arrow
+  const sx0=DCX+50*Math.cos(sunA),sy0=DCY+50*Math.sin(sunA);
+  const sx1=DCX+76*Math.cos(sunA),sy1=DCY+76*Math.sin(sunA);
+  dctx.beginPath();dctx.moveTo(sx0,sy0);dctx.lineTo(sx1,sy1);
+  dctx.strokeStyle='rgba(255,215,70,.75)';dctx.lineWidth=1.5;dctx.stroke();
+  dctx.font='11px serif';dctx.fillStyle='rgba(255,215,70,.85)';dctx.fillText('☀',sx1-6,sy1+4);
+
+  // Orbit path
+  dctx.beginPath();dctx.arc(DCX,DCY,OR,0,Math.PI*2);
+  dctx.strokeStyle='rgba(255,105,180,.16)';dctx.lineWidth=1;dctx.setLineDash([2,4]);dctx.stroke();dctx.setLineDash([]);
+
+  // Earth
+  const eg=dctx.createRadialGradient(DCX-3,DCY-3,2,DCX,DCY,20);
+  eg.addColorStop(0,'#1e4a80');eg.addColorStop(.5,'#0d2a50');eg.addColorStop(1,'#040f20');
+  dctx.beginPath();dctx.arc(DCX,DCY,20,0,Math.PI*2);dctx.fillStyle=eg;dctx.fill();
+  dctx.beginPath();dctx.arc(DCX,DCY,22.5,0,Math.PI*2);dctx.strokeStyle='rgba(80,160,255,.42)';dctx.lineWidth=2;dctx.stroke();
+
+  // Moon
+  const mx=DCX+OR*Math.cos(moonA),my=DCY+OR*Math.sin(moonA);
+  const mg=dctx.createRadialGradient(mx,my,8,mx,my,22);
+  mg.addColorStop(0,'rgba(255,105,180,.5)');mg.addColorStop(1,'rgba(255,20,147,0)');
+  dctx.beginPath();dctx.arc(mx,my,22,0,Math.PI*2);dctx.fillStyle=mg;dctx.fill();
+  const mm=dctx.createRadialGradient(mx-2,my-2,1,mx,my,9);
+  mm.addColorStop(0,'#ffcce8');mm.addColorStop(.5,'#ff69b4');mm.addColorStop(1,'#c2185b');
+  dctx.beginPath();dctx.arc(mx,my,9,0,Math.PI*2);dctx.fillStyle=mm;dctx.fill();
+
+  // User dot
+  if(hasLoc){
+    const phR=(90-userLat)*Math.PI/180,lR=userLon*Math.PI/180,rot=t*.06;
+    const ux=DCX+15*Math.sin(phR)*Math.cos(lR+rot),uy=DCY-15*Math.cos(phR);
+    dctx.beginPath();dctx.moveTo(ux,uy);dctx.lineTo(mx,my);
+    dctx.strokeStyle='rgba(255,105,180,.2)';dctx.lineWidth=.8;dctx.stroke();
+    dctx.beginPath();dctx.arc(ux,uy,2.5,0,Math.PI*2);dctx.fillStyle='#ff69b4';dctx.fill();
+    const p2=.5+.5*Math.sin(t*3);
+    dctx.beginPath();dctx.arc(ux,uy,4+p2*3,0,Math.PI*2);
+    dctx.strokeStyle=`rgba(255,105,180,${.6-p2*.4})`;dctx.lineWidth=1;dctx.stroke();
+  }else{
+    dctx.font='7px Courier New';dctx.fillStyle='rgba(255,182,193,.45)';dctx.fillText('YOU',DCX-8,DCY+4);
+  }
+}
+
+// ── Animate ───────────────────────────────────────────────────
+const clock=new THREE.Clock();let loaded=false;
+
+(function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  if(!loaded&&t>1.4){
+    loaded=true;
+    const L=document.getElementById('loader');
+    L.style.opacity='0';setTimeout(()=>L.style.display='none',900);
+  }
+
+  earth.rotation.y=t*.045;
+
+  const oT=t*.082;
+  moonGroup.position.set(2.6*Math.cos(oT),.55+.14*Math.sin(oT*.68),-1.+.95*Math.sin(oT));
+  moonGroup.rotation.y=t*.018;
+  moonLight.position.copy(moonGroup.position);
+
+  const mDir=moonGroup.position.clone().normalize();
+  earthMat.uniforms.mDir.value=mDir;
+  earthMat.uniforms.t.value=t;
+  earthMat.uniforms.camPos.value.copy(camera.position);
+  moonMat.uniforms.t.value=t;
+  if(starMat)starMat.uniforms.t.value=t;
+
+  tickMarker();
+  if(marker){
+    const p=.5+.5*Math.sin(t*2.2);
+    marker.halo.material.opacity=.1+p*.2;
+    marker.ring.material.opacity=.38+p*.62;
+  }
+
+  drawDiag(t);
+  controls.update();
+  renderer.render(scene,camera);
+})();
+
+// ── Resize ────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+// ── Date pill ─────────────────────────────────────────────────
+document.getElementById('dpill').textContent=
+  new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · Full Moon';
+</script>
+</body>
+</html>
